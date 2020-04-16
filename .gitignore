@@ -1,0 +1,5 @@
+# Sqlite
+*.sqlite3
+
+# pycache
+jobs/*.pyc
