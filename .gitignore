@@ -2,4 +2,5 @@
 *.sqlite3
 
 # pycache
-jobs/*.pyc
+__pycache__
+*.pyc
