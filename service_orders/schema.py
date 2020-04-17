@@ -1,21 +1,23 @@
+from base64 import b64decode
 import django_filters
 import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
-from jobs.models import Job
+from graphql_relay import from_global_id
+from service_orders.models import ServiceOrder
 
-class JobFilter(django_filters.FilterSet):
+class ServiceOrderFilter(django_filters.FilterSet):
     class Meta:
-        model = Job
-        fields = ['name', 'per_meter', 'job_group']
+        model = ServiceOrder
+        fields = ['id', 'title', 'open_date', 'close_date']
 
 
-class JobNode(DjangoObjectType):
+class ServiceOrserNode(DjangoObjectType):
     class Meta:
-        model = Job
+        model = ServiceOrder
         interfaces = (graphene.relay.Node, )
 
-
+        
 ###########################################################################
 #  ______     __  __     ______     ______     __     ______     ______   # 
 # /\  __ \   /\ \/\ \   /\  ___\   /\  == \   /\ \   /\  ___\   /\  ___\  # 
@@ -25,9 +27,9 @@ class JobNode(DjangoObjectType):
 ###########################################################################
 
 class Query(graphene.ObjectType):
-    job = DjangoFilterConnectionField(
-        JobNode,
-        filterset_class=JobFilter,
+    service_order = DjangoFilterConnectionField(
+        ServiceOrserNode,
+        filterset_class=ServiceOrderFilter
     )
 
 
@@ -39,37 +41,38 @@ class Query(graphene.ObjectType):
 #   \/_/  \/_/   \/_____/     \/_/   \/_/\/_/     \/_/   \/_/   \/_____/   \/_/ \/_/   \/_____/# 
 ################################################################################################
 
-class CreateJob(graphene.relay.ClientIDMutation):
-    job = graphene.Field(JobNode)
+class CreateServiceOrder(graphene.relay.ClientIDMutation):
+    service_order = graphene.Field(ServiceOrserNode)
 
     class Input:
-        name = graphene.String(
-            description='Name of job!',
+        title = graphene.String(
+            description='Title of Service Order!',
+            required=True,
+        )
+        description = graphene.String(
+            description='Description of problem!',
             required=True,
         )
         per_meter = graphene.Boolean(
-            description='This job can be charged per meter!',
+            description='''Your problem can be solved with mathematical measures.
+            E.g. apartment painting!''',
             required=True,
         )
-        value_per_meter = graphene.Float(
-            description='If can be charged per meter, what is the price of the meter?'
-        )
-        job_group = graphene.String(
-            description='Group of job',
-            required=True,
-        )
-
+        # job = graphene.ID(
+        #     description='Job Id',
+        #     required=True,
+        # )
+    
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
-        job = Job(
-            name=_input.get('name'),
+        service_order = ServiceOrder(
+            title=_input.get('title'),
+            description=_input.get('description'),
             per_meter=_input.get('per_meter'),
-            value_per_meter=_input.get('value_per_meter'),
-            job_group=_input.get('job_group'),
         )
-        job.save()
+        service_order.save()
 
-        return CreateJob(job=job)
+        return CreateServiceOrder(service_order=service_order)
 
 
 class Mutation(graphene.AbstractType):
-    create_job = CreateJob.Field()
+    create_service_order = CreateServiceOrder.Field()

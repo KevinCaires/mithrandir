@@ -48,12 +48,13 @@ API para criação e manipulação de ordens de serviço.
 import graphene
 import graphql_jwt
 import jobs.schema as jobs
+import service_orders.schema as service
 
-class Query(jobs.Query, graphene.ObjectType):
+class Query(jobs.Query, service.Query, graphene.ObjectType):
     pass
 
 
-class Mutation(jobs.Mutation, graphene.ObjectType):
+class Mutation(jobs.Mutation, service.Mutation, graphene.ObjectType):
     pass
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
