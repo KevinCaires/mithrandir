@@ -49,12 +49,15 @@ import graphene
 import graphql_jwt
 import jobs.schema as jobs
 import service_orders.schema as service
+import users.schema as users
 
-class Query(jobs.Query, service.Query, graphene.ObjectType):
+class Query(jobs.Query, service.Query, users.Query, graphene.ObjectType):
     pass
 
 
-class Mutation(jobs.Mutation, service.Mutation, graphene.ObjectType):
-    pass
+class Mutation(jobs.Mutation, service.Mutation, users.Mutation, graphene.ObjectType):
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

@@ -4,6 +4,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay import from_global_id
+from jobs.models import Job
 from service_orders.models import ServiceOrder
 
 class ServiceOrderFilter(django_filters.FilterSet):
@@ -12,7 +13,7 @@ class ServiceOrderFilter(django_filters.FilterSet):
         fields = ['id', 'title', 'open_date', 'close_date']
 
 
-class ServiceOrserNode(DjangoObjectType):
+class ServiceOrderNode(DjangoObjectType):
     class Meta:
         model = ServiceOrder
         interfaces = (graphene.relay.Node, )
@@ -28,7 +29,7 @@ class ServiceOrserNode(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     service_order = DjangoFilterConnectionField(
-        ServiceOrserNode,
+        ServiceOrderNode,
         filterset_class=ServiceOrderFilter
     )
 
@@ -42,7 +43,7 @@ class Query(graphene.ObjectType):
 ################################################################################################
 
 class CreateServiceOrder(graphene.relay.ClientIDMutation):
-    service_order = graphene.Field(ServiceOrserNode)
+    service_order = graphene.Field(ServiceOrderNode)
 
     class Input:
         title = graphene.String(
@@ -58,7 +59,7 @@ class CreateServiceOrder(graphene.relay.ClientIDMutation):
             E.g. apartment painting!''',
             required=True,
         )
-        # job = graphene.ID(
+        # job_id = graphene.ID(
         #     description='Job Id',
         #     required=True,
         # )
@@ -68,6 +69,7 @@ class CreateServiceOrder(graphene.relay.ClientIDMutation):
             title=_input.get('title'),
             description=_input.get('description'),
             per_meter=_input.get('per_meter'),
+            # job=_input.get('job_id'),
         )
         service_order.save()
 

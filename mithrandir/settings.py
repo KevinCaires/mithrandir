@@ -49,7 +49,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',    
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'mithrandir.urls'
@@ -125,3 +126,14 @@ STATIC_URL = '/static/'
 GRAPHENE = {
     'SCHEMA':'mithrandir.schema.schema',
 }
+
+'''
+python(path=“…/graphql-python/mithrandir/mithrandir/settings.py”) GRAPHENE = {
+    ‘SCHEMA’: ‘mysite.myschema.schema’, 
+    ‘MIDDLEWARE’: [ ‘graphql_jwt.middleware.JSONWebTokenMiddleware’, ], 
+    } 
+'''
+AUTHENTICATION_BACKENDS = [
+    'graphql_jwt.backends.JSONWebTokenBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]

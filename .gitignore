@@ -1,6 +1,11 @@
-# Sqlite
+# DB
 *.sqlite3
 
 # pycache
 __pycache__
 *.pyc
+migrations/
+
+# arquivos de test
+black_list/
+users/schema_new.py
