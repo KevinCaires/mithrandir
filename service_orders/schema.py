@@ -91,6 +91,9 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         service_value = graphene.Float(
             description='Valor to be payd'
         )
+        description = graphene.String(
+            description='Service description',
+        )
     
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         _id = _input.get('id')
@@ -103,16 +106,28 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         if _input.get('service_value'):
             close_date = datetime.datetime.now()
         
-        # Issue 4.
-        data_open = ServiceOrder.objects.get(pk=_id)  # pylint: disable=no-member
-        data_open = data_open.open_date
+        # Pega os dados já pertencentes ao objeto. Issue 4.
+        # Gambiarra mode:On.
+        service_orders = ServiceOrder.objects.get(pk=_id)  # pylint: disable=no-member
+        data_open = service_orders.open_date
+        
+        title = _input.get( 'title')
+        
+        if not title:
+            title = service_orders.title
+        
+        description = _input.get('description')
+
+        if not description:
+            description = service_orders.description
 
         service_order = ServiceOrder(
             id=_input.get('id'),
-            title=_input.get('title'),
+            title=title,
             service_value=_input.get('service_value'),
             close_date=close_date,
             open_date=data_open,
+            description=description,
         )
         service_order.save()
 
