@@ -6,6 +6,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay import from_global_id
 from jobs.models import Job
 from service_orders.models import ServiceOrder
+import datetime
 
 class ServiceOrderFilter(django_filters.FilterSet):
     class Meta:
@@ -76,5 +77,47 @@ class CreateServiceOrder(graphene.relay.ClientIDMutation):
         return CreateServiceOrder(service_order=service_order)
 
 
+class UpdateServiceOrder(graphene.relay.ClientIDMutation):
+    service_order = graphene.Field(ServiceOrderNode)
+
+    class Input:
+        id = graphene.ID(
+            description='Service Order Id',
+            required=True,
+        )
+        title = graphene.String(
+            description='Service Order Title',
+        )
+        service_value = graphene.Float(
+            description='Valor to be payd'
+        )
+    
+    def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
+        _id = _input.get('id')
+        
+        if not _id:
+            raise Exception('Service id is required!')
+
+        close_date = ''
+
+        if _input.get('service_value'):
+            close_date = datetime.datetime.now()
+        
+        # Issue 4.
+        data_open = ServiceOrder.objects.get(pk=_id)  # pylint: disable=no-member
+        data_open = data_open.open_date
+
+        service_order = ServiceOrder(
+            id=_input.get('id'),
+            title=_input.get('title'),
+            service_value=_input.get('service_value'),
+            close_date=close_date,
+            open_date=data_open,
+        )
+        service_order.save()
+
+        return UpdateServiceOrder(service_order=service_order)
+
 class Mutation(graphene.AbstractType):
     create_service_order = CreateServiceOrder.Field()
+    update_service_order = UpdateServiceOrder.Field()
