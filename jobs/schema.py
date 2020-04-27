@@ -111,7 +111,10 @@ class UpdateJob(graphene.relay.ClientIDMutation):
         
         value_per_meter = _input.get('value_per_meter')
 
-        if not value_per_meter:
+        if value_per_meter:
+            if per_meter == False:
+                raise Exception('Not necessary | per_meter:false')
+        elif not value_per_meter:
             value_per_meter = jobs.value_per_meter
 
         job_group = _input.get('job_group')
