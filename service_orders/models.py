@@ -22,11 +22,11 @@ class ServiceOrder(models.Model):
         null=True,
     )
     # Issue # 1
-    # job = models.ForeignKey(
-    #     Job,
-    #     null=False,
-    #     on_delete=models.CASCADE
-    # )
+    job_id = models.ForeignKey(
+        Job,
+        null=False,
+        on_delete=models.CASCADE,
+    )
     per_meter = models.BooleanField(
         null=False,
         blank=False,

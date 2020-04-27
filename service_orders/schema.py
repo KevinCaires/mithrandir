@@ -1,4 +1,3 @@
-from base64 import b64decode
 import django_filters
 import graphene
 from graphene_django import DjangoObjectType
@@ -19,7 +18,7 @@ class ServiceOrderNode(DjangoObjectType):
         model = ServiceOrder
         interfaces = (graphene.relay.Node, )
 
-        
+
 ###########################################################################
 #  ______     __  __     ______     ______     __     ______     ______   # 
 # /\  __ \   /\ \/\ \   /\  ___\   /\  == \   /\ \   /\  ___\   /\  ___\  # 
@@ -60,17 +59,27 @@ class CreateServiceOrder(graphene.relay.ClientIDMutation):
             E.g. apartment painting!''',
             required=True,
         )
-        # job_id = graphene.ID(
-        #     description='Job Id',
-        #     required=True,
-        # )
+        job_id = graphene.ID(
+            description='Job Id',
+            required=True,
+        )
     
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
+        _id = _input.get('job_id')
+        if not _id:
+            raise Exception('Job id is required!')
+        
+        try:
+            job = Job.objects.get(pk=_id)  # pylint: disable=no-member
+        except:
+            raise Exception('Job id not found')
+        
+
         service_order = ServiceOrder(
             title=_input.get('title'),
             description=_input.get('description'),
             per_meter=_input.get('per_meter'),
-            # job=_input.get('job_id'),
+            job_id=job,
         )
         service_order.save()
 
@@ -94,38 +103,46 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         description = graphene.String(
             description='Service description',
         )
-    
+        job_id = graphene.ID(
+            description='Job Id',            
+        )
+
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         _id = _input.get('id')
-        
+
         if not _id:
             raise Exception('Service id is required!')
 
-        
         #  /\_/\
         # ( o.o )
         #  > ^ <
-        # A parte a baixo possuí gatos.
-        
+        # Vá com calma, a parte a baixo possuí gatos.
+
         close_date = ''
 
         if _input.get('service_value'):
             close_date = datetime.datetime.now()
-        
-        # Pega os dados já pertencentes ao objeto. Issue 4.
+
+        # Pega os dados já pertencentes ao objeto. Issue #4.
         # Gambiarra mode:On.
         service_orders = ServiceOrder.objects.get(pk=_id)  # pylint: disable=no-member
         data_open = service_orders.open_date
-        
+
         title = _input.get( 'title')
-        
+
         if not title:
             title = service_orders.title
-        
+
         description = _input.get('description')
 
         if not description:
             description = service_orders.description
+
+        job_id = _input.get('job_id')
+
+        if not job_id:
+            job_id = service_orders.job_id
+
 
         service_order = ServiceOrder(
             id=_input.get('id'),
