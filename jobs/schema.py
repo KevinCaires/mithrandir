@@ -71,5 +71,66 @@ class CreateJob(graphene.relay.ClientIDMutation):
         return CreateJob(job=job)
 
 
+class UpdateJob(graphene.relay.ClientIDMutation):
+    job = graphene.Field(JobNode)
+
+    class Input:
+        id = graphene.ID(
+            descripition='Job Id',
+            required=True,
+        )
+        name = graphene.String(
+            description='Job Title'
+        )
+        per_meter = graphene.Boolean(
+            description='This job can be charged per meter!'
+        )
+        value_per_meter = graphene.Float(
+            description='If can be charged per meter, what is the price of the meter?'
+        )
+        job_group = graphene.String(
+            description='Group of job'
+        )
+    
+    def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
+        _id = _input.get('id')
+
+        if not _id:
+            raise Exception('Id is required!')
+        
+        per_meter = _input.get('per_meter')
+
+        if not per_meter:
+            raise Exception('Per meter is required!')
+
+        jobs = Job.objects.get(pk=_id)  # pylint: disable=no-member
+        name = _input.get('name')
+        
+        if not name:
+            name = jobs.name
+        
+        value_per_meter = _input.get('value_per_meter')
+
+        if not value_per_meter:
+            value_per_meter = jobs.value_per_meter
+
+        job_group = _input.get('job_group')
+
+        if not job_group:
+            job_group = jobs.job_group
+        
+        job = Job(
+            id=_id,
+            name=name,
+            per_meter=per_meter,
+            value_per_meter=value_per_meter,
+            job_group=job_group,
+        )
+        job.save()
+
+        return UpdateJob(job=job)
+
+
 class Mutation(graphene.AbstractType):
     create_job = CreateJob.Field()
+    update_job = UpdateJob.Field()

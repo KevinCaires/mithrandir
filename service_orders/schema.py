@@ -101,6 +101,12 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         if not _id:
             raise Exception('Service id is required!')
 
+        
+        #  /\_/\
+        # ( o.o )
+        #  > ^ <
+        # A parte a baixo possuí gatos.
+        
         close_date = ''
 
         if _input.get('service_value'):
