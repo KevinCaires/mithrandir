@@ -1,11 +1,13 @@
+import datetime
 import django_filters
 import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay import from_global_id
 from jobs.models import Job
+from mithrandir.tools import get_object_id
 from service_orders.models import ServiceOrder
-import datetime
+
 
 class ServiceOrderFilter(django_filters.FilterSet):
     class Meta:
@@ -59,7 +61,7 @@ class CreateServiceOrder(graphene.relay.ClientIDMutation):
             E.g. apartment painting!''',
             required=True,
         )
-        job_id = graphene.ID(
+        job_id = graphene.String(
             description='Job Id',
             required=True,
         )
@@ -69,8 +71,10 @@ class CreateServiceOrder(graphene.relay.ClientIDMutation):
         if not _id:
             raise Exception('Job id is required!')
         
+        job_id = get_object_id(_id, 'JobNode')
+
         try:
-            job = Job.objects.get(pk=_id)  # pylint: disable=no-member
+            job = Job.objects.get(pk=job_id)  # pylint: disable=no-member
         except:
             raise Exception('Job id not found')
         
@@ -90,7 +94,7 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
     service_order = graphene.Field(ServiceOrderNode)
 
     class Input:
-        id = graphene.ID(
+        id = graphene.String(
             description='Service Order Id',
             required=True,
         )
@@ -103,12 +107,12 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         description = graphene.String(
             description='Service description',
         )
-        job_id = graphene.ID(
+        job_id = graphene.String(
             description='Job Id',            
         )
 
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
-        _id = _input.get('id')
+        _id = get_object_id(_input.get('id'), 'ServiceOrderNode')
 
         if not _id:
             raise Exception('Service id is required!')
@@ -141,7 +145,7 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         if not description:
             description = service_orders.description
 
-        job_id = _input.get('job_id')
+        job_id = get_object_id(_input.get('job_id'), 'JobNode')
 
         if not job_id:
             job_id = service_orders.job_id
