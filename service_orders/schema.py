@@ -116,16 +116,19 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         #  /\_/\
         # ( o.o )
         #  > ^ <
-        # Vá com calma, a parte a baixo possuí gatos.
-
-        close_date = ''
-
-        if _input.get('service_value'):
-            close_date = datetime.datetime.now()
+        # Vá com calma, o código a baixo possuí gatos.
 
         # Pega os dados já pertencentes ao objeto. Issue #4.
-        # Gambiarra mode:On.
         service_orders = ServiceOrder.objects.get(pk=_id)  # pylint: disable=no-member
+
+        close_date = ''
+        service_value = _input.get('service_value')
+
+        if service_value:
+            close_date = datetime.datetime.now()
+        else:
+            close_date = None
+
         data_open = service_orders.open_date
 
         title = _input.get( 'title')
@@ -143,7 +146,6 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         if not job_id:
             job_id = service_orders.job_id
 
-
         service_order = ServiceOrder(
             id=_input.get('id'),
             title=title,
@@ -151,6 +153,7 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
             close_date=close_date,
             open_date=data_open,
             description=description,
+            job_id=job_id,
         )
         service_order.save()
 
