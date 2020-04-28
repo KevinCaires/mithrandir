@@ -3,6 +3,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from jobs.models import Job
+from mithrandir.tools import get_object_id
 
 class JobFilter(django_filters.FilterSet):
     class Meta:
@@ -75,7 +76,7 @@ class UpdateJob(graphene.relay.ClientIDMutation):
     job = graphene.Field(JobNode)
 
     class Input:
-        id = graphene.ID(
+        id = graphene.String(
             descripition='Job Id',
             required=True,
         )
@@ -93,31 +94,28 @@ class UpdateJob(graphene.relay.ClientIDMutation):
         )
     
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
-        _id = _input.get('id')
+        _id = get_object_id(_input.get('id'), 'JobNode')
+        jobs = Job.objects.get(pk=_id)  # pylint: disable=no-member
+        value_per_meter = _input.get('value_per_meter')
+        per_meter = _input.get('per_meter')
+        job_group = _input.get('job_group')
+        name = _input.get('name')
 
         if not _id:
             raise Exception('Id is required!')
-        
-        per_meter = _input.get('per_meter')
 
-        if not per_meter:
-            raise Exception('Per meter is required!')
+        if per_meter == True:
+            if not value_per_meter:
+                raise Exception('Value per meter is required!')
 
-        jobs = Job.objects.get(pk=_id)  # pylint: disable=no-member
-        name = _input.get('name')
-        
         if not name:
             name = jobs.name
-        
-        value_per_meter = _input.get('value_per_meter')
 
         if value_per_meter:
             if per_meter == False:
-                raise Exception('Not necessary | per_meter:false')
+                raise Exception('Value per meter is not required!')
         elif not value_per_meter:
-            value_per_meter = jobs.value_per_meter
-
-        job_group = _input.get('job_group')
+            value_per_meter = None
 
         if not job_group:
             job_group = jobs.job_group
