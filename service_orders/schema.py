@@ -124,7 +124,6 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
 
         # Pega os dados já pertencentes ao objeto. Issue #4.
         service_orders = ServiceOrder.objects.get(pk=_id)  # pylint: disable=no-member
-
         close_date = ''
         service_value = _input.get('service_value')
 
@@ -145,19 +144,21 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         if not description:
             description = service_orders.description
 
-        job_id = get_object_id(_input.get('job_id'), 'JobNode')
+        job = ''
 
-        if not job_id:
-            job_id = service_orders.job_id
+        if not _input.get('job_id'):
+            job = Job.objects.get(pk=service_orders.job_id)  # pylint: disable=no-member
+        else:
+            job = Job.objects.get(pk=get_object_id(_input.get('job_id'), 'JobNode'))  # pylint: disable=no-member
 
         service_order = ServiceOrder(
-            id=_input.get('id'),
+            id=_id,
             title=title,
             service_value=_input.get('service_value'),
             close_date=close_date,
             open_date=data_open,
             description=description,
-            job_id=job_id,
+            job_id=job,
         )
         service_order.save()
 
