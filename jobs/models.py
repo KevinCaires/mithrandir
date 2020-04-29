@@ -25,6 +25,21 @@ class Job(models.Model):
         null=False,
         on_delete=models.CASCADE,
     )
+    has_ppe = models.BooleanField(
+        null=False,
+        blank=False,
+        default=False,
+    )
+    ppe = models.ForeignKey(
+        'PersonalProtectiveEquipment',
+        null=True,
+        on_delete=models.CASCADE,
+    )
+    job_equipment = models.ForeignKey(
+        'JobEquipment',
+        null=True,
+        on_delete=models.CASCADE,
+    )
 
 
 class JobGroup(models.Model):
@@ -44,24 +59,54 @@ class JobGroup(models.Model):
     )
 
 
-# class PersonalProtectiveEquipment(models.Model):
-#     """
-#     Equipamento de proteção individual.
-#     É obrigatório que os usuário prestadores dos serviços tenham o próprio equipamento.
-#     """
-#     name = models.CharField(
-#         null=False,
-#         blank=False,
-#         unique=True,
-#         max_length=50,
-#     )
-#     description = models.TextField(
-#         null=False,
-#         blank=False,
-#     )
+class PersonalProtectiveEquipment(models.Model):
+    """
+    Equipamento de proteção individual.
+    É obrigatório que os usuário prestadores dos serviços tenham o próprio equipamento.
+    """
+    name = models.CharField(
+        null=False,
+        blank=False,
+        unique=True,
+        max_length=50,
+    )
+    equipment_model = models.CharField(
+        null=False,
+        blank=False,
+        max_length=50,
+    )
+    serial_number = models.CharField(
+        null=True,
+        blank=True,
+        max_length=50,
+    )
+    description = models.TextField(
+        null=False,
+        blank=False,
+    )
 
 
-# class JobEquipment(models.Model):
-#     """
-#     Equipamentos necessários para que a atividade possa ser prestada.
-#     """
+class JobEquipment(models.Model):
+    """
+    Equipamentos necessários para que a atividade possa ser prestada.
+    """
+    name = models.CharField(
+        null=False,
+        blank=False,
+        unique=True,
+        max_length=50,
+    )
+    equipment_model = models.CharField(
+        null=False,
+        blank=False,
+        max_length=50,
+    )
+    serial_number = models.CharField(
+        null=True,
+        blank=True,
+        max_length=50,
+    )
+    description = models.TextField(
+        null=False,
+        blank=False,
+    )
