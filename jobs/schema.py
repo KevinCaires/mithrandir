@@ -33,12 +33,6 @@ class PersonalProtectiveEquipmentNode(DjangoObjectType):
         interfaces = (graphene.relay.Node, )
 
 
-class PersonalProtectiveEquipmentNode(DjangoObjectType):
-    class Meta:
-        model = PersonalProtectiveEquipment
-        interfaces = (graphene.relay.Node, )
-
-
 class JobEquipmentNode(DjangoObjectType):
     class Meta:
         model = JobEquipment
