@@ -14,7 +14,13 @@ class JobGroupFilter(django_filters.FilterSet):
 class PersonalProtectiveEquipmentFilter(django_filters.FilterSet):
     class Meta:
         model = PersonalProtectiveEquipment
-        fields = ['name', 'id']
+        fields = ['name']
+
+
+class JobEquipmentFilter(django_filters.FilterSet):
+    class Meta:
+        model = JobEquipment
+        fields = ['name']
 
 class JobFilter(django_filters.FilterSet):
     class Meta:
@@ -24,6 +30,18 @@ class JobFilter(django_filters.FilterSet):
 class PersonalProtectiveEquipmentNode(DjangoObjectType):
     class Meta:
         model = PersonalProtectiveEquipment
+        interfaces = (graphene.relay.Node, )
+
+
+class PersonalProtectiveEquipmentNode(DjangoObjectType):
+    class Meta:
+        model = PersonalProtectiveEquipment
+        interfaces = (graphene.relay.Node, )
+
+
+class JobEquipmentNode(DjangoObjectType):
+    class Meta:
+        model = JobEquipment
         interfaces = (graphene.relay.Node, )
 
 
@@ -51,6 +69,10 @@ class Query(graphene.ObjectType):
     job = DjangoFilterConnectionField(
         JobNode,
         filterset_class=JobFilter,
+    )
+    job_equipment = DjangoFilterConnectionField(
+        JobEquipmentNode,
+        filterset_class=JobEquipmentFilter,
     )
     job_group = DjangoFilterConnectionField(
         JobGroupNode,
@@ -111,12 +133,55 @@ class CreatePersonalProtectiveEquipment(graphene.relay.ClientIDMutation):
         )
 
 
+class CreateJobEquipment(graphene.relay.ClientIDMutation):
+    job_equipment = graphene.Field(JobEquipmentNode)
+
+    class Input:
+        name = graphene.String(
+            description='Equipment name',
+            required=True,
+        )
+        description = graphene.String(
+            description='Serial description',
+            required=True,
+        )
+        equipment_model = graphene.String(
+            description='Equipment model',
+        )
+        serial_number = graphene.String(
+            description='Serial number',
+        )
+
+    def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
+        name = _input.get('name')
+        description = _input.get('description')
+        serial_number = _input.get('serial_number')
+        if not name:
+            raise Exception('Name is required!')
+        
+        if not description:
+            raise Exception('Description is required!')
+
+        if not serial_number:
+            serial_number = None
+
+        job_equipment = JobEquipment(
+            name=name,
+            description=description,
+            serial_number=serial_number,
+            equipment_model=_input.get('equipment_model'),
+        )
+        job_equipment.save()
+
+        return CreateJobEquipment(job_equipment=job_equipment)
+
+
 class CreateJobGroup(graphene.relay.ClientIDMutation):
     job_group = graphene.Field(JobGroupNode)
 
     class Input:
         name = graphene.String(
-            description='Nome of group',
+            description='Name group',
             required=True,
         )
         description = graphene.String(
@@ -175,6 +240,63 @@ class CreateJob(graphene.relay.ClientIDMutation):
         job.save()
 
         return CreateJob(job=job)
+
+
+class UpdateJobEquipment(graphene.relay.ClientIDMutation):
+    job_equipment = graphene.Field(JobEquipmentNode)
+
+    class Input:
+        id = graphene.String(
+            description='Equipment ID',
+            required=True,
+        )
+        name = graphene.String(
+            description='Equipment name',
+        )
+        description = graphene.String(
+            description='Equipement description',
+        )
+        equipment_model = graphene.String(
+            description='Equipment model',
+        )
+        serial_number = graphene.String(
+            description='Equipment serial number',
+        )
+
+    def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
+        _id = get_object_id(_input.get('id'), 'JobEquipmentNode')
+        name = _input.get('name')
+        description = _input.get('description')
+        equipment_model = _input.get('equipment_model')
+        serial_number = _input.get('serial_number')
+
+        if not _id:
+            raise Exception('ID is required!')
+
+        job_equipments = JobEquipment.objects.get(pk=_id)  # pylint: disable=no-member
+
+        if not name:
+            name = job_equipments.name
+        
+        if not description:
+            description = job_equipments.description
+        
+        if not equipment_model:
+            equipment_model = job_equipments.equipment_model
+
+        if not serial_number:
+            serial_number = job_equipments.serial_number
+        
+        job_equipment = JobEquipment(
+            id=_id,
+            name=name,
+            description=description,
+            equipment_model=equipment_model,
+            serial_number=serial_number,
+        )
+        job_equipment.save()
+
+        return UpdateJobEquipment(job_equipment=job_equipment)
 
 
 class UpdatePersonalProtectiveEquipment(graphene.relay.ClientIDMutation):
@@ -283,7 +405,7 @@ class UpdateJob(graphene.relay.ClientIDMutation):
 
     class Input:
         id = graphene.String(
-            descripition='Job Id',
+            description='Job Id',
             required=True,
         )
         name = graphene.String(
@@ -340,8 +462,10 @@ class UpdateJob(graphene.relay.ClientIDMutation):
 
 class Mutation(graphene.AbstractType):
     create_job = CreateJob.Field()
+    create_job_equipment = CreateJobEquipment.Field()
     create_job_group = CreateJobGroup.Field()
     create_personal_protective_equipment = CreatePersonalProtectiveEquipment.Field()
     update_job = UpdateJob.Field()
+    update_job_equipment = UpdateJobEquipment.Field()
     update_job_group = UpdateJobGroup.Field()
     update_personal_protective_equipment = UpdatePersonalProtectiveEquipment.Field()
