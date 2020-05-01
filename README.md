@@ -23,7 +23,7 @@ As dependencias e pacotes necessários estão contidas no arquivo `dev.txt` dent
 ### `Creates`
 
 Mutation que cria EPI's no sistema:
-```json
+```
 mutation{
   createPersonalProtectiveEquipment(input:{
     name:"Some name"
@@ -43,7 +43,7 @@ mutation{
 ```
 
 Mutation que cria equipamentos da atividate:
-```json
+```
 mutation{
   createJobEquipment(input:{
     name:"Some name"
@@ -63,7 +63,7 @@ mutation{
 ```
 
 Mutation que cria o tipo de atividade:
-```json
+```
 mutation{
   createJobGroup(input:{
     name:"Some name"
@@ -79,7 +79,7 @@ mutation{
 ```
 
 Mutation que cria a atividade:
-```json
+```
 mutation{
    createJob(input:{
     name:"Some name",
@@ -121,7 +121,7 @@ mutation{
 ```
 
 Mutation que cria uma ordem de serviço:
-```json
+```
 mutation{
   createServiceOrder(input:{
     title:"Some title"
@@ -169,7 +169,7 @@ mutation{
 ### `Queries`
 
 Query que retorna as EPI's cadastradas no sistema: 
-```json
+```
 query{
   personalProtectiveEquipment{
     edges{
@@ -186,7 +186,7 @@ query{
 ```
 
 Query que retorna os equipamentos de trabalho cadastrados:
-```json
+```
 query{
   jobEquipment{
     edges{
@@ -203,7 +203,7 @@ query{
 ```
 
 Query que retorna os tipos de atividades cadastradas:
-```json
+```
 query{
   jobGroup{
     edges{
@@ -217,7 +217,7 @@ query{
 ```
 
 Query que retorna uma atividade com seu tipo e equipamentos cadastrados:
-```json
+```
 query{
   job{
     edges{
@@ -252,7 +252,7 @@ query{
 ```
 
 Query que retorna as ordens de serviço criadas:
-```json
+```
 query{
   serviceOrder{
     edges{
@@ -299,7 +299,7 @@ query{
 ### `Updates`
 
 Mutation que edita as EPI's do sistena:
-```json
+```
 mutation{
   updatePersonalProtectiveEquipment(input:{
     id:"Some id",
@@ -319,7 +319,7 @@ mutation{
 ```
 
 Mutation que edita os Equipamentos do sistema:
-```json
+```
 mutation{
   updateJobEquipment(input:{
     id:"Some id",
@@ -339,7 +339,7 @@ mutation{
 ```
 
 Mutation que edita o grupo de atividades:
-```json
+```
 mutation{
   updateJobGroup(input:{
     id:"Some id"
@@ -355,7 +355,7 @@ mutation{
 ```
 
 Mutation que edita a atividade:
-```json
+```
 mutation{
   updateJob(input:{
     id:"Some id",
@@ -397,7 +397,7 @@ mutation{
 ```
 
 Mutation que edita a ordem de serviço:
-```json
+```
 mutation{
   updateServiceOrder(input:{
     id:"Some id"
