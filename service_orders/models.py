@@ -21,7 +21,6 @@ class ServiceOrder(models.Model):
     service_value = models.FloatField(
         null=True,
     )
-    # Issue # 1
     job_id = models.ForeignKey(
         Job,
         null=False,

@@ -17,7 +17,7 @@ class Job(models.Model):
         default=False,
     )
     value_per_meter = models.FloatField(
-        null=False,
+        null=True,
         default=False,
     )
     job_group = models.ForeignKey(

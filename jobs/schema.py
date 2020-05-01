@@ -85,6 +85,7 @@ class Query(graphene.ObjectType):
 #   \/_/  \/_/   \/_____/     \/_/   \/_/\/_/     \/_/   \/_/   \/_____/   \/_/ \/_/   \/_____/# 
 ################################################################################################
 
+#########  SECTION #########
 class CreatePersonalProtectiveEquipment(graphene.relay.ClientIDMutation):
     personal_protective_equipment = graphene.Field(PersonalProtectiveEquipmentNode)
 
@@ -211,7 +212,6 @@ class CreateJob(graphene.relay.ClientIDMutation):
         )
         per_meter = graphene.Boolean(
             description='This job can be charged per meter!',
-            required=True,
         )
         value_per_meter = graphene.Float(
             description='If can be charged per meter, what is the price of the meter?'
@@ -220,21 +220,56 @@ class CreateJob(graphene.relay.ClientIDMutation):
             description='Group of job',
             required=True,
         )
+        job_equipment_id = graphene.String(
+            description='Job equipment ID'
+        )
+        has_ppe = graphene.Boolean(
+            description='Personal Protective Equipment is needed',
+            required=True,
+        )
+        ppe_id = graphene.String(
+            description='Personal Protective Equipment ID',
+        )
 
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
-        _id = get_object_id(_input.get('job_group_id'), 'JobGroupNode')
-        job_group_id = JobGroup.objects.get(pk=_id)  # pylint: disable=no-member
+        job_group_id = get_object_id(_input.get('job_group_id'), 'JobGroupNode')
+        job_equipment_id = get_object_id(_input.get('job_equipment_id'), 'JobEquipmentNode')
+        ppe_id = get_object_id(_input.get('ppe_id'), 'PersonalProtectiveEquipmentNode')
+        name = _input.get('name')
+        per_meter = _input.get('per_meter')
+        value_per_meter = _input.get('value_per_meter')
+        has_ppe = _input.get('has_ppe')
+        job_group = JobGroup.objects.get(pk=job_group_id)  # pylint: disable=no-member
+        job_equipment = JobEquipment.objects.get(pk=job_equipment_id)  # pylint: disable=no-member
+        ppe = PersonalProtectiveEquipment.objects.get(pk=ppe_id)  # pylint: disable=no-member
+
+        if not job_group_id:
+            raise Exception('Job group ID is required!')
+
+        if not name:
+            raise Exception('Job name is required!')
+
+        if per_meter == True and not value_per_meter:
+            raise Exception('Value per meter is required!')
+
+        if has_ppe == True and not ppe:
+            raise Exception('Personal Protective Equipment ID is required!')
 
         job = Job(
             name=_input.get('name'),
             per_meter=_input.get('per_meter'),
             value_per_meter=_input.get('value_per_meter'),
-            job_group=job_group_id,
+            job_group=job_group,
+            job_equipment=job_equipment,
+            has_ppe=has_ppe,
+            ppe=ppe,
         )
         job.save()
 
         return CreateJob(job=job)
 
+
+######### UPDATES SECTION ###########
 
 class UpdateJobEquipment(graphene.relay.ClientIDMutation):
     job_equipment = graphene.Field(JobEquipmentNode)
@@ -411,17 +446,32 @@ class UpdateJob(graphene.relay.ClientIDMutation):
         value_per_meter = graphene.Float(
             description='If can be charged per meter, what is the price of the meter?'
         )
-        job_group = graphene.String(
-            description='Group of job'
+        job_group_id = graphene.String(
+            description='Job group ID!'
+        )
+        job_equipment_id = graphene.String(
+            description='Job equipment ID!'
+        )
+        has_ppe = graphene.Boolean(
+            description="Has personal protective equipment?",
+        )
+        ppe_id = graphene.String(
+            description="Personal protective equipment ID!"
         )
     
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         _id = get_object_id(_input.get('id'), 'JobNode')
-        jobs = Job.objects.get(pk=_id)  # pylint: disable=no-member
+        job_equipment_id = get_object_id(_input.get('job_equipment_id'), 'JobEquipmentNode')
+        ppe_id = get_object_id(_input.get('ppe_id'), 'PersonalProtectiveEquipmentNode')
+        job_group_id = get_object_id(_input.get('job_group_id'), 'JobGroupNode')
         value_per_meter = _input.get('value_per_meter')
         per_meter = _input.get('per_meter')
-        job_group = _input.get('job_group')
         name = _input.get('name')
+        has_ppe = _input.get('has_ppe')
+        jobs = Job.objects.get(pk=_id)  # pylint: disable=no-member
+        job_equipment = JobEquipment.objects.get(pk=job_equipment_id)  # pylint: disable=no-member
+        ppe = PersonalProtectiveEquipment.objects.get(pk=ppe_id)  # pylint: disable=no-member
+        job_group = JobGroup.objects.get(pk=job_group_id)  # pylint: disable=no-member
 
         if not _id:
             raise Exception('Id is required!')
@@ -439,8 +489,10 @@ class UpdateJob(graphene.relay.ClientIDMutation):
         elif not value_per_meter:
             value_per_meter = None
 
-        if not job_group:
-            job_group = jobs.job_group
+        if has_ppe == True and not ppe:
+            raise Exception('Personal protective equipment id is required!')
+        elif has_ppe == False and ppe:
+            raise Exception('Personal protective equipment id is not required!')
         
         job = Job(
             id=_id,
@@ -448,6 +500,9 @@ class UpdateJob(graphene.relay.ClientIDMutation):
             per_meter=per_meter,
             value_per_meter=value_per_meter,
             job_group=job_group,
+            job_equipment=job_equipment,
+            has_ppe=has_ppe,
+            ppe=ppe,
         )
         job.save()
 
