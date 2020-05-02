@@ -65,25 +65,33 @@ class CreateServiceOrder(graphene.relay.ClientIDMutation):
             description='Job Id',
             required=True,
         )
+        need_certificate = graphene.Boolean(
+            description='Need certificate to render the service.',
+            required=True,
+        )
+        need_equipment = graphene.Boolean(
+            description='Need equipment to render the service.',
+            required=True,
+        )
     
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
-        _id = _input.get('job_id')
+        _id = get_object_id(_input.get('job_id'), 'JobNode')
+        need_certificate = _input.get('need_certificate')
+        need_equipment = _input.get('need_equipment')
+
         if not _id:
             raise Exception('Job id is required!')
-        
-        job_id = get_object_id(_id, 'JobNode')
 
-        try:
-            job = Job.objects.get(pk=job_id)  # pylint: disable=no-member
-        except:
-            raise Exception('Job id not found')
-        
+        job = Job.objects.get(pk=_id)  # pylint: disable=no-member
+                
 
         service_order = ServiceOrder(
             title=_input.get('title'),
             description=_input.get('description'),
             per_meter=_input.get('per_meter'),
             job_id=job,
+            need_certificate=need_certificate,
+            need_equipment=need_equipment,
         )
         service_order.save()
 
@@ -102,13 +110,19 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
             description='Service Order Title',
         )
         service_value = graphene.Float(
-            description='Valor to be payd'
+            description='Value to be payd'
         )
         description = graphene.String(
             description='Service description',
         )
         job_id = graphene.String(
             description='Job Id',            
+        )
+        need_certificate = graphene.Boolean(
+            description='Need certificate to render the service.',
+        )
+        need_equipment = graphene.Boolean(
+            description='Need equipment to render the service.',
         )
 
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
@@ -126,6 +140,7 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         service_orders = ServiceOrder.objects.get(pk=_id)  # pylint: disable=no-member
         close_date = ''
         service_value = _input.get('service_value')
+        
 
         if service_value:
             close_date = datetime.datetime.now()
@@ -144,12 +159,20 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
         if not description:
             description = service_orders.description
 
-        job = ''
-
-        if not _input.get('job_id'):
-            job = Job.objects.get(pk=service_orders.job_id)  # pylint: disable=no-member
-        else:
+        try:
             job = Job.objects.get(pk=get_object_id(_input.get('job_id'), 'JobNode'))  # pylint: disable=no-member
+
+        except:
+            job = Job.objects.get(pk=service_orders.job_id.id)  # pylint: disable=no-member
+
+        need_equipment = _input.get('need_equipment')
+        need_certificate = _input.get('need_certificate')
+
+        if need_certificate == None:
+            need_certificate = service_orders.need_certificate
+
+        if need_equipment  == None:
+            need_equipment = service_orders.need_equipment
 
         service_order = ServiceOrder(
             id=_id,
@@ -159,6 +182,8 @@ class UpdateServiceOrder(graphene.relay.ClientIDMutation):
             open_date=data_open,
             description=description,
             job_id=job,
+            need_certificate=need_certificate,
+            need_equipment=need_equipment,
         )
         service_order.save()
 

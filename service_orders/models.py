@@ -31,7 +31,16 @@ class ServiceOrder(models.Model):
         blank=False,
         default=False,
     )
-
+    need_certificate = models.BooleanField(
+        null=False,
+        blank=False,
+        default=True,
+    )
+    need_equipment = models.BooleanField(
+        null=False,
+        blank=False,
+        default=True,
+    )
 
 
 class Vote(models.Model):
