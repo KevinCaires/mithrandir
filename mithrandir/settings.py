@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'graphene_django',
     'jobs',
     'service_orders',
+    'users',
+    'blacklist',
 ]
 
 MIDDLEWARE = [
@@ -47,10 +49,10 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'graphql_jwt.middleware.JSONWebTokenMiddleware',
 ]
 
 ROOT_URLCONF = 'mithrandir.urls'
@@ -127,12 +129,14 @@ GRAPHENE = {
     'SCHEMA':'mithrandir.schema.schema',
 }
 
+'''python(path=“…/graphql-python/mithrandir/mithrandir/settings.py”) 
+    
+    GRAPHENE = {
+    ‘SCHEMA’: ‘mysite.myschema.schema’,
+    ‘MIDDLEWARE’: [ ‘graphql_jwt.middleware.JSONWebTokenMiddleware’, ],
+}
 '''
-python(path=“…/graphql-python/mithrandir/mithrandir/settings.py”) GRAPHENE = {
-    ‘SCHEMA’: ‘mysite.myschema.schema’, 
-    ‘MIDDLEWARE’: [ ‘graphql_jwt.middleware.JSONWebTokenMiddleware’, ], 
-    } 
-'''
+ 
 AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',

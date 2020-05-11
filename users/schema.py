@@ -1,10 +1,17 @@
 from django.contrib.auth import get_user_model
+import django_filters
 import graphene
 from graphene_django import DjangoObjectType
-
+from graphene_django.filter import DjangoFilterConnectionField
+from mithrandir.tools import logged_in
 class UserType(DjangoObjectType):
     class Meta:
         model = get_user_model()
+
+class UserNode(DjangoObjectType):
+    class Meta:
+        model = get_user_model()
+        interfaces = (graphene.relay.Node,)
 
 ###########################################################################
 #  ______     __  __     ______     ______     __     ______     ______   # 
@@ -21,13 +28,18 @@ class Query(graphene.ObjectType):
     def resolve_users(self, info):
         return get_user_model().objects.all()
 
-    # Classe de teste para o login.
+    @logged_in
     def resolve_me(self, info):
+        """
+        Teste function
+        """
         user = info.context.user
         if user.is_anonymous:
             raise Exception('Log in to continue!')
 
-        return user
+        return get_user_model().objects.all()
+
+
 
 
 ################################################################################################
@@ -38,7 +50,7 @@ class Query(graphene.ObjectType):
 #   \/_/  \/_/   \/_____/     \/_/   \/_/\/_/     \/_/   \/_/   \/_____/   \/_/ \/_/   \/_____/# 
 ################################################################################################
 
-class CreateUser(graphene.Mutation):
+class CreateUser(graphene.relay.ClientIDMutation):
     """ Cria um usuário """
     user = graphene.Field(UserType)
 
@@ -58,18 +70,18 @@ class CreateUser(graphene.Mutation):
             required=True,
         )
 
-    def mutate(self, info, **_input):
+    def mutate_and_get_payload(self, info, **_input):
         user = get_user_model()(
             username=_input.get('username'),
             email=_input.get('email'),
             first_name=_input.get('first_name'),
             last_name=_input.get('last_name'),
         )
-        user.save()
         user.set_password(_input.get('password'))
+        user.save()
 
         return CreateUser(user=user)
 
 
-class Mutation(graphene.ObjectType):
+class Mutation(graphene.AbstractType):
     create_user = CreateUser.Field()
