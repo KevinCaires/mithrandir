@@ -19,7 +19,7 @@ def get_object_id(hash_id, object_name):
         raise Exception('Invalid Id!')
 
     return int(object_id)
-id
+
 
 def logged_in(function):
     '''
