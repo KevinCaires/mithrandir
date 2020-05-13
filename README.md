@@ -15,8 +15,15 @@ A API mithrandir foi criada com a intenção de fornecer suporte à criação e 
 
 As dependencias e pacotes necessários estão contidas no arquivo `dev.txt` dentro do diretório requirements.
 
+### Instalação
 
-
+| Ambiente Linux |
+|----------------|
+| 1° - Crie um ambiente virtual destinado ao projeto e acesse o mesmo. |
+| 2° - Com o ambiente criado você pode instalar os pacotes com `make install`. |
+| 3° - Faça as migrações necessárias com `make migrate`. |
+| 4° - Rode o projeto com o comando `make run`. |
+| A API estará rodando no localhost porta 6006 e pode ser acessada diretamente do navegador ou então programas como insomnia. As `queries` para consulta e `mutations` para criação e modificação dos objetos encontram-se logo a baixo. |
 
 ## Consultas Graphql
 
