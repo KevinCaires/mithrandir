@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'graphene_django',
     'jobs',
     'service_orders',
-    'users',
+    'login',
     'blacklist',
 ]
 
@@ -141,3 +141,5 @@ AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+AUTH_USER_MODEL = 'login.User'
