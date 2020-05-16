@@ -30,9 +30,7 @@ class UserNode(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     login = graphene.List(UserNode)
-    teste = graphene.List(UserNode)
 
-    @logged_in
     def resolve_login(self, info, **kwargs):
         return User.objects.all()
 
