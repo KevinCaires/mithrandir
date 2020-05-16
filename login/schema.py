@@ -134,45 +134,8 @@ class LoginUpdate(graphene.relay.ClientIDMutation):
         worker = graphene.Boolean(
             description='Want work with the app.'
         )
-    
-    @logged_in
-    def mutate_and_get_payload(self, info, **_input):
-        _id = get_object_id(_input.get('id'), 'LoginNode')
-        user = Login.objects.get(pk=_id)  # pylint: disable=no-member
-        username = _input.get('username')
-        email = _input.get('email')
-        password = _input.get('password')
-        cpf = _input.get('cpf')
-        worker = _input.get('worker')
-
-        if not username:
-            username = user.username
-
-        if not email:
-            email = user.email
-        
-        if not password:
-            password = user.password
-
-        if not cpf:
-            cpf = user.email
-
-        if not worker:
-            worker = user.worker 
-
-        login = Login(
-            username=username,
-            email=email,
-            cpf=cpf,
-            worker=worker,
-        )
-        login.set_password(password)  # pylint: disable=no-member
-        login.save()  # pylint: disable=no-member
-        
-        return LoginUpdate(login=login)
 
 
 class Mutation(graphene.AbstractType):
     create_login = LoginCreate.Field()
-    update_login = LoginUpdate.Field()
     login = Login.Field()
