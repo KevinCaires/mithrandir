@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'jobs',
     'service_orders',
     'login',
-    'blacklist',
 ]
 
 MIDDLEWARE = [

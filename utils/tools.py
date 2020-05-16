@@ -1,5 +1,4 @@
 from base64 import b64decode, b64encode
-from blacklist.models import TokenList
 from decouple import config
 from functools import wraps
 from graphql_relay import from_global_id

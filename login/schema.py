@@ -4,7 +4,7 @@ from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from itertools import chain
 from login.models import User
-from utils.tools import token_gen, logged_in
+from utils.tools import token_gen, logged_in, get_object_id
 
 class UserNode(DjangoObjectType):
     class Meta:
@@ -35,9 +35,6 @@ class Query(graphene.ObjectType):
     def resolve_login(self, info, **kwargs):
         return User.objects.all()
 
-    @logged_in
-    def resolve_teste(self, info, kwargs):
-        return User.objects.all()
 
 
 ################################################################################################
@@ -86,7 +83,7 @@ class LoginCreate(graphene.relay.ClientIDMutation):
         user.set_password(_input.get('password'))
         user.save()
 
-        return LoginCreate()
+        return LoginCreate(user=user)
 
 
 class Login(graphene.relay.ClientIDMutation):
@@ -109,12 +106,73 @@ class Login(graphene.relay.ClientIDMutation):
             token = token_gen(user.id)
 
             login = User(token=token)
-            login.save
+            login.save()
 
         return Login(login=login)
 
 
+class LoginUpdate(graphene.relay.ClientIDMutation):
+    login = graphene.Field(UserNode)
+
+    class Input:
+        id = graphene.String(
+            description='Login user id.',
+            required=True,
+        )
+        username = graphene.String(
+            description='User name.'
+        )
+        email = graphene.String(
+            description='User email.'
+        )
+        password = graphene.String(
+            description='User password.'
+        )
+        cpf = graphene.String(
+            description='User document.'
+        )
+        worker = graphene.Boolean(
+            description='Want work with the app.'
+        )
+    
+    @logged_in
+    def mutate_and_get_payload(self, info, **_input):
+        _id = get_object_id(_input.get('id'), 'LoginNode')
+        user = Login.objects.get(pk=_id)  # pylint: disable=no-member
+        username = _input.get('username')
+        email = _input.get('email')
+        password = _input.get('password')
+        cpf = _input.get('cpf')
+        worker = _input.get('worker')
+
+        if not username:
+            username = user.username
+
+        if not email:
+            email = user.email
+        
+        if not password:
+            password = user.password
+
+        if not cpf:
+            cpf = user.email
+
+        if not worker:
+            worker = user.worker 
+
+        login = Login(
+            username=username,
+            email=email,
+            cpf=cpf,
+            worker=worker,
+        )
+        login.set_password(password)  # pylint: disable=no-member
+        login.save()  # pylint: disable=no-member
+        
+        return LoginUpdate(login=login)
+
 
 class Mutation(graphene.AbstractType):
     create_login = LoginCreate.Field()
+    update_login = LoginUpdate.Field()
     login = Login.Field()
