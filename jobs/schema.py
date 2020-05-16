@@ -3,7 +3,8 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from jobs.models import Job, JobGroup, PersonalProtectiveEquipment, JobEquipment
-from mithrandir.tools import get_object_id
+from utils.tools import get_object_id
+
 
 class JobGroupFilter(django_filters.FilterSet):
     class Meta:

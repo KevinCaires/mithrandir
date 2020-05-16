@@ -3,7 +3,9 @@ import django_filters
 import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
-from mithrandir.tools import logged_in
+from utils.tools import logged_in
+
+
 class UserType(DjangoObjectType):
     class Meta:
         model = get_user_model()
@@ -11,7 +13,7 @@ class UserType(DjangoObjectType):
 class UserNode(DjangoObjectType):
     class Meta:
         model = get_user_model()
-        interfaces = (graphene.relay.Node,)
+        interfaces = (graphene.relay.Node, )
 
 ###########################################################################
 #  ______     __  __     ______     ______     __     ______     ______   # 
@@ -51,7 +53,9 @@ class Query(graphene.ObjectType):
 ################################################################################################
 
 class CreateUser(graphene.relay.ClientIDMutation):
-    """ Cria um usuário """
+    """ 
+    Cria um usuário
+    """
     user = graphene.Field(UserType)
 
     class Input:
