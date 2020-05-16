@@ -32,6 +32,7 @@ class Query(graphene.ObjectType):
     login = graphene.List(UserNode)
     teste = graphene.List(UserNode)
 
+    @logged_in
     def resolve_login(self, info, **kwargs):
         return User.objects.all()
 
@@ -109,31 +110,6 @@ class Login(graphene.relay.ClientIDMutation):
             login.save()
 
         return Login(login=login)
-
-
-class LoginUpdate(graphene.relay.ClientIDMutation):
-    login = graphene.Field(UserNode)
-
-    class Input:
-        id = graphene.String(
-            description='Login user id.',
-            required=True,
-        )
-        username = graphene.String(
-            description='User name.'
-        )
-        email = graphene.String(
-            description='User email.'
-        )
-        password = graphene.String(
-            description='User password.'
-        )
-        cpf = graphene.String(
-            description='User document.'
-        )
-        worker = graphene.Boolean(
-            description='Want work with the app.'
-        )
 
 
 class Mutation(graphene.AbstractType):
