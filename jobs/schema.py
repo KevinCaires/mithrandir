@@ -3,7 +3,8 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from jobs.models import Job, JobGroup, PersonalProtectiveEquipment, JobEquipment
-from mithrandir.tools import get_object_id
+from utils.tools import get_object_id, logged_in
+
 
 class JobGroupFilter(django_filters.FilterSet):
     class Meta:
@@ -85,7 +86,7 @@ class Query(graphene.ObjectType):
 #   \/_/  \/_/   \/_____/     \/_/   \/_/\/_/     \/_/   \/_/   \/_____/   \/_/ \/_/   \/_____/# 
 ################################################################################################
 
-#########  SECTION #########
+######### CREATES SECTION #########
 class CreatePersonalProtectiveEquipment(graphene.relay.ClientIDMutation):
     personal_protective_equipment = graphene.Field(PersonalProtectiveEquipmentNode)
 
@@ -105,6 +106,7 @@ class CreatePersonalProtectiveEquipment(graphene.relay.ClientIDMutation):
             required=True,
         )
 
+    @logged_in
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         name = _input.get('name')
         description = _input.get('description')
@@ -147,6 +149,7 @@ class CreateJobEquipment(graphene.relay.ClientIDMutation):
             description='Serial number',
         )
 
+    @logged_in
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         name = _input.get('name')
         description = _input.get('description')
@@ -183,7 +186,8 @@ class CreateJobGroup(graphene.relay.ClientIDMutation):
             description="Group description",
             required=True,
         )
-    
+
+    @logged_in
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         name = _input.get('name')
         description = _input.get('description')
@@ -231,6 +235,7 @@ class CreateJob(graphene.relay.ClientIDMutation):
             description='Personal Protective Equipment ID',
         )
 
+    @logged_in
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         job_group_id = get_object_id(_input.get('job_group_id'), 'JobGroupNode')
         job_equipment_id = get_object_id(_input.get('job_equipment_id'), 'JobEquipmentNode')
@@ -292,6 +297,7 @@ class UpdateJobEquipment(graphene.relay.ClientIDMutation):
             description='Equipment serial number',
         )
 
+    @logged_in
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         _id = get_object_id(_input.get('id'), 'JobEquipmentNode')
         name = _input.get('name')
@@ -349,6 +355,7 @@ class UpdatePersonalProtectiveEquipment(graphene.relay.ClientIDMutation):
             description='PPE Serial number',
         )
 
+    @logged_in
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         _id = get_object_id(_input.get('id'), 'PersonalProtectiveEquipmentNode')
         name = _input.get('name')
@@ -402,6 +409,7 @@ class UpdateJobGroup(graphene.relay.ClientIDMutation):
             description="Group description",
         )
 
+    @logged_in
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         _id = get_object_id(_input.get('id'), 'JobGroupNode')
         name = _input.get('name')
@@ -458,7 +466,8 @@ class UpdateJob(graphene.relay.ClientIDMutation):
         ppe_id = graphene.String(
             description="Personal protective equipment ID!"
         )
-    
+
+    @logged_in
     def mutate_and_get_payload(root, info, **_input):  # pylint: disable=no-self-argument
         _id = get_object_id(_input.get('id'), 'JobNode')
         job_equipment_id = get_object_id(_input.get('job_equipment_id'), 'JobEquipmentNode')

@@ -5,8 +5,8 @@ from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay import from_global_id
 from jobs.models import Job
-from mithrandir.tools import get_object_id
 from service_orders.models import ServiceOrder
+from utils.tools import get_object_id
 
 
 class ServiceOrderFilter(django_filters.FilterSet):
