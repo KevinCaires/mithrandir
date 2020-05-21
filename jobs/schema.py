@@ -87,6 +87,8 @@ class Query(graphene.ObjectType):
 ################################################################################################
 
 ######### CREATES SECTION #########
+
+
 class CreatePersonalProtectiveEquipment(graphene.relay.ClientIDMutation):
     personal_protective_equipment = graphene.Field(PersonalProtectiveEquipmentNode)
 
