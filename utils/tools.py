@@ -1,12 +1,11 @@
 from base64 import b64decode, b64encode
-from decouple import config
 from functools import wraps
 from graphql_relay import from_global_id
 import jwt
+from mithrandir.settings import SECRET_KEY
 from login.models import User
 from time import time
 
-SECRET_KEY = config('SECRET_KEY')
 
 def get_object_id(hash_id, object_name):
     """
