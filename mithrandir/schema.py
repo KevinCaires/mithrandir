@@ -50,13 +50,25 @@ import graphql_jwt
 import jobs.schema as jobs
 import service_orders.schema as service
 import login.schema as logins
+import profiles.schema as profiles
 
 
-class Query(logins.Query, jobs.Query, service.Query, graphene.ObjectType):
+class Query(
+    jobs.Query,
+    logins.Query,
+    service.Query, 
+    graphene.ObjectType
+):
     pass
 
 
-class Mutation(logins.Mutation, jobs.Mutation, service.Mutation, graphene.ObjectType):
+class Mutation(
+    jobs.Mutation,
+    logins.Mutation,
+    profiles.Mutation,
+    service.Mutation,
+    graphene.ObjectType,
+):
     pass
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
