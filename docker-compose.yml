@@ -10,28 +10,31 @@ services:
       MYSQL_DATABASE: $MYSQL_DATABASE
       MYSQL_USER: $MYSQL_USER
       MYSQL_PASSWORD: $MYSQL_PASSWORD
-      MYSQL_ROOT_PASSWORD: $ MYSQL_ROOT_PASSWORD
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+    ports:
+      - "3306:3306"
 
   mithrandir:
     build: .    
     image: mithrandir:devel
     restart: on-failure
-    container_name: mithrandir_container
-    command: gunicorn -w 3 mithrandir.wsgi:application -b :6006
-    environment: 
-      MYSQL_DATABASE: $MYSQL_DATABASE
-      MYSQL_USER: $MYSQL_USER
-      MYSQL_PASSWORD: $MYSQL_PASSWORD
-      MYSQL_ROOT_PASSWORD: $ MYSQL_ROOT_PASSWORD
-      SECRET_KEY: $SECRET_KEY
+    container_name: mithrandir_service_container
+    command: gunicorn -w 3 mithrandir.wsgi.application # -b :6006
     volumes:
       - .:/app
       - static_data:/app/static
       - ".:/usr/src/code"
-    expose:
-      - "6006"
+    ports:
+      - "6006:6006"
     depends_on:
       - mithrandir_db
+
+  migration:
+    build: .
+    image: mithrandir:devel
+    restart: on-failure
+    container_name: migrations
+    command: python manage.pt migrate
 
 volumes: 
   static_data:
