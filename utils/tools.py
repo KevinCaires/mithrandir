@@ -1,4 +1,3 @@
-from base64 import b64decode, b64encode
 from decouple import config
 from functools import wraps
 from graphql_relay import from_global_id
@@ -66,7 +65,12 @@ def token_gen(user_id):
             'exp':int(time()) + 3600,
         }
     
-    except:
+    except Exception as ex:
+        print(f'''
+        
+        ERROR: {ex}
+        
+        ''')
         payload = {
             'uid':None,
             'username':None,
