@@ -1,8 +1,9 @@
+from black_list.models import TokenBlackList
 from decouple import config
 from functools import wraps
 from graphql_relay import from_global_id
 import jwt
-from login.models import User
+from login.models import User, Token
 from time import time
 
 SECRET_KEY = config('SECRET_KEY')
@@ -32,6 +33,10 @@ def logged_in(function):
     @wraps(function)
     def decorated(*args, **kwargs):
         token = args[1].context.META.get('HTTP_AUTHORIZATION')
+        is_black_listed = TokenBlackList.objects.filter(token_list=token)  # pylint: disable=no-member
+
+        if is_black_listed:
+            raise Exception('Session EXPIRED, please log in again!')
 
         try:
             user = jwt.decode(token, SECRET_KEY, algorithm='HS256')
@@ -49,12 +54,12 @@ def logged_in(function):
     return decorated
 
 
-def token_gen(user_id):
+def token_gen(user):
     """
     Gera uma token JWT.
     """
     try:
-        user = User.objects.get(pk=user_id)
+        user = User.objects.get(pk=user)
         payload = {
             'uid':user.id,
             'username':user.username,
@@ -84,3 +89,24 @@ def token_gen(user_id):
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
 
     return token
+
+
+def log_out(function):
+    '''
+    Desloga o client e põe o token em black list.
+    '''
+    @wraps(function)
+    def decorated(*args, **kwargs):
+        token = args[1].context.META.get('HTTP_AUTHORIZATION')
+
+        try:
+            Token.objects.filter(token=token).delete()  #  pylint: disable=no-member
+        
+        except:
+            pass
+
+        black_list = TokenBlackList(token_list=token)
+        black_list.save()
+
+        return function(*args, **kwargs)
+    return decorated
