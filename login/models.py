@@ -26,10 +26,6 @@ class User(AbstractUser):
         unique=False,
         max_length=20,
     )
-    token = models.CharField(
-        null=True,
-        max_length=300,
-    )
     worker = models.BooleanField(
         default=False,
     )
@@ -40,3 +36,14 @@ class User(AbstractUser):
             ('common_user', 'Common permissions.'),
             ('worker_user', 'Can workon with a job type.'),
         ]
+
+
+class Token(models.Model):
+    user = models.ForeignKey(
+        'login.User',
+        null=False,
+        on_delete=models.CASCADE,
+    )
+    token = models.TextField(
+        null=False,
+    )
