@@ -5,7 +5,3 @@
 __pycache__
 *.pyc
 migrations/
-
-# arquivos de test
-black_list/
-users/schema_new.py
