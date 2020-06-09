@@ -3,8 +3,8 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from itertools import chain
-from login.models import User
-from utils.tools import token_gen, logged_in, get_object_id
+from login.models import User, Token
+from utils.tools import token_gen, logged_in, get_object_id, log_out
 
 class UserNode(DjangoObjectType):
     class Meta:
@@ -20,6 +20,12 @@ class UserNode(DjangoObjectType):
         return [p.codename for p in response]
 
 
+class TokenNode(DjangoObjectType):
+    class Meta:
+        model = Token
+        interfaces = (graphene.relay.Node,)
+
+
 ###########################################################################
 #  ______     __  __     ______     ______     __     ______     ______   # 
 # /\  __ \   /\ \/\ \   /\  ___\   /\  == \   /\ \   /\  ___\   /\  ___\  # 
@@ -30,9 +36,14 @@ class UserNode(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     login = graphene.List(UserNode)
+    logout = graphene.List(UserNode)
 
     def resolve_login(self, info, **kwargs):
         return User.objects.all()
+
+    @log_out
+    def resolve_logout(self, info, **kwargs):
+        raise Exception('Bye!')
 
 
 
@@ -86,7 +97,7 @@ class LoginCreate(graphene.relay.ClientIDMutation):
 
 
 class Login(graphene.relay.ClientIDMutation):
-    login = graphene.Field(UserNode)
+    login = graphene.Field(TokenNode)
 
     class Input:
         email = graphene.String(
@@ -101,10 +112,14 @@ class Login(graphene.relay.ClientIDMutation):
     def mutate_and_get_payload(self, info, **_input):
         user = User.objects.get(email=_input.get('email'))
         login = ''
+        
         if user.check_password(_input.get('password')):
             token = token_gen(user.id)
 
-            login = User(token=token)
+            login = Token(
+                user=user,
+                token=token,
+            )
             login.save()
 
         return Login(login=login)
