@@ -19,7 +19,7 @@ services:
     image: mithrandir:devel
     restart: on-failure
     container_name: mithrandir_service_container
-    command: gunicorn -w 3 mithrandir.wsgi.application # -b :6006
+    command: python manage.py runserver 0.0.0.0:6006
     volumes:
       - .:/app
       - static_data:/app/static
@@ -34,7 +34,7 @@ services:
     image: mithrandir:devel
     restart: on-failure
     container_name: migrations
-    command: python manage.pt migrate
+    command: python manage.py migrate
 
 volumes: 
   static_data:
