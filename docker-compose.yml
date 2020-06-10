@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+
+  mithrandir_db:
+    image: mariadb:10.3
+    restart: always
+    container_name: mithrandir_MDB
+    environment: 
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_USER: $MYSQL_USER
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+    ports:
+      - "3306:3306"
+
+  mithrandir:
+    build: .    
+    image: mithrandir:devel
+    restart: on-failure
+    container_name: mithrandir_service_container
+    command: python manage.py runserver 0.0.0.0:6006
+    volumes:
+      - .:/app
+      - static_data:/app/static
+      - ".:/usr/src/code"
+    ports:
+      - "6006:6006"
+    depends_on:
+      - mithrandir_db
+
+  migration:
+    build: .
+    image: mithrandir:devel
+    restart: on-failure
+    container_name: migrations
+    command: python manage.py migrate
+
+volumes: 
+  static_data:
