@@ -14,3 +14,15 @@ shell:
 install:
 	pip install -r requirements/dev.txt
 
+
+build:
+	docker-compose build
+
+
+mkmigrate:
+	docker-compose run mithrandir python manage.py makemigrations
+	docker-compose run mithrandir python manage.py migrate
+
+
+up:
+	docker-compose up
