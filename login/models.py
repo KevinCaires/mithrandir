@@ -18,7 +18,7 @@ class User(AbstractUser):
     password = models.CharField(
         null=False,
         blank=False,
-        max_length=50,
+        max_length=300,
     )
     cpf = models.CharField(
         null=False,
