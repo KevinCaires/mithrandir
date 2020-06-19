@@ -1,27 +1,18 @@
-run:
-	python manage.py runserver 127.0.0.1:6006
-
-
 migrate:
-	python manage.py makemigrations
-	python manage.py migrate
+	docker-compose run python managr.py makemigrations
+	docker-compose run python manage.py migrate
 
 
-shell:
-	python manage.py shell
+mithrandir:
+	docker-compose exec mithrandir sh
 
 
 install:
-	pip install -r requirements/dev.txt
+	docker-compose build
 
 
 build:
 	docker-compose build
-
-
-mkmigrate:
-	docker-compose run mithrandir python manage.py makemigrations
-	docker-compose run mithrandir python manage.py migrate
 
 
 up:
