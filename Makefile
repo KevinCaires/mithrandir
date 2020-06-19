@@ -3,12 +3,12 @@ migrate:
 	docker-compose run mithrandir python manage.py migrate
 
 
-mithrandir:
-	docker-compose exec mithrandir sh
-
-
 install:
-	docker-compose
+	docker-compose build
+
+
+shell:
+	python manage.py shell
 
 
 build:
