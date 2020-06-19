@@ -1,6 +1,6 @@
 migrate:
-	docker-compose run python managr.py makemigrations
-	docker-compose run python manage.py migrate
+	docker-compose run mithrandir python manage.py makemigrations
+	docker-compose run mithrandir python manage.py migrate
 
 
 mithrandir:
@@ -8,7 +8,7 @@ mithrandir:
 
 
 install:
-	docker-compose build
+	docker-compose
 
 
 build:
