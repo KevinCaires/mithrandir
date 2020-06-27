@@ -79,6 +79,7 @@ class LoginCreate(graphene.relay.ClientIDMutation):
             required=True,
         )
     
+    @logged_in
     def mutate_and_get_payload(self, info, **_input):
         cpf = _input.get('cpf')
         
@@ -123,7 +124,7 @@ class LoginUpdate(graphene.relay.ClientIDMutation):
         worker = graphene.Boolean(
             descripton='Turn into worker?'
         )
-    
+
     @logged_in
     def mutate_and_get_payload(self, info, **_input):
         _id = get_object_id(_input.get('id'), 'UserNode')
