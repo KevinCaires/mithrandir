@@ -61,14 +61,17 @@ def token_gen(user):
     try:
         user = User.objects.get(pk=user)
         payload = {
-            'uid':user.id,
+            'id':user.id,
             'username':user.username,
             'email':user.email,
             'cpf':user.cpf,
             'worker':user.worker,
             'is_anonymous':False,
-            'exp':int(time()) + 3600,
+            'exp':int(time()) + 18000,
         }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+
+        return token
     
     except Exception as ex:
         print(f'''
@@ -76,19 +79,6 @@ def token_gen(user):
         ERROR: {ex}
         
         ''')
-        payload = {
-            'uid':None,
-            'username':None,
-            'email':None,
-            'cpf':None,
-            'worker':None,
-            'is_anonymous':True,
-            'exp':int(time()) + 1,
-        }
-    
-    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
-
-    return token
 
 
 def log_out(function):
