@@ -5,7 +5,7 @@ services:
   mithrandir_db:
     image: mariadb:10.3
     restart: always
-    container_name: mithrandir_MDB
+    container_name: mithrandir_db
     environment: 
       MYSQL_DATABASE: $MYSQL_DATABASE
       MYSQL_USER: $MYSQL_USER
@@ -28,13 +28,6 @@ services:
       - "6006:6006"
     depends_on:
       - mithrandir_db
-
-  migration:
-    build: .
-    image: mithrandir:devel
-    restart: on-failure
-    container_name: migrations
-    command: python manage.py migrate
 
 volumes: 
   static_data:

@@ -86,7 +86,7 @@ DATABASES = {
         'NAME': config('MYSQL_DATABASE'),
         'USER': config('MYSQL_USER'),
         'PASSWORD': config('MYSQL_PASSWORD'),
-        'HOST': 'mithrandir_MDB',
+        'HOST': 'mithrandir_db',
         'PORT': 3306,
     }
 }
