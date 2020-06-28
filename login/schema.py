@@ -78,8 +78,7 @@ class LoginCreate(graphene.relay.ClientIDMutation):
             description='Document number.',
             required=True,
         )
-    
-    @logged_in
+
     def mutate_and_get_payload(self, info, **_input):
         cpf = _input.get('cpf')
         
